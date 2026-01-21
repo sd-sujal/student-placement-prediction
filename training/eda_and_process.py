@@ -1,20 +1,23 @@
-import pandas as pd 
-df=pd.read_csv("data/raw/student_data.csv")
+import pandas as pd
 
-print("Shape: ", df.shape)
+# Load raw dataset
+df = pd.read_csv("data/raw/student_data.csv")
+
+# Basic info
+print("Shape:", df.shape)
+
 print("\nPlacement Distribution:")
-print(df["Placed"].value_counts())
+print(df["placed"].value_counts())
 
-print("Correlartion with placement:")
-print(df.corr()["placed"].sort_values(ascending=False))
+print("\nCorrelation with placement:")
+print(df.corr(numeric_only=True)["placed"].sort_values(ascending=False))
 
-# Basic validation rules
+# Sanity checks (IMPORTANT)
+assert df.isnull().sum().sum() == 0, "Dataset contains null values"
+assert df["cgpa"].between(5.0, 10.0).all(), "CGPA out of range"
+assert (df.loc[df["placed"] == 0, "salary_lpa"] == 0).all(), "Unplaced students have salary"
 
-assert df.isnull().sum().sum()==0
-assert df["cgpa"].between(5.0,10.0).all()
-assert (df.loc[df["placed"]==0,"salary_lpa"]==0).all()
+# Save processed dataset (no transformations yet)
+df.to_csv("data/processed/student_data_clean.csv", index=False)
 
-# Save processed copy (no transformation yet)
-
-df.to_csv("data/processed/student_data_clean.csv",index=False)
-print("\nProcessed data saved")
+print("\nProcessed data saved to data/processed/student_data_clean.csv")
