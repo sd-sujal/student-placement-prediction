@@ -4,3 +4,6 @@ __pycache__/
 *.pyc
 models/*.pkl
 notebooks/
+*.db
+*.db-journal
+.pytest_cache/
