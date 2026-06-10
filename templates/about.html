@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Model Details{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">ML pipeline</p>
+        <h1>Model Details</h1>
+        <p class="hero-copy">This project trains a balanced Logistic Regression classifier for placement status and a Random Forest regressor for expected salary among placed candidates.</p>
+    </div>
+</section>
+
+<section class="model-grid">
+    <article>
+        <h2>Classification</h2>
+        <dl>
+            <div><dt>Accuracy</dt><dd>{{ "%.2f"|format(metrics.get("classification", {}).get("accuracy", 0) * 100) }}%</dd></div>
+            <div><dt>F1 Score</dt><dd>{{ "%.2f"|format(metrics.get("classification", {}).get("f1_score", 0) * 100) }}%</dd></div>
+            <div><dt>ROC AUC</dt><dd>{{ "%.2f"|format(metrics.get("classification", {}).get("roc_auc", 0) * 100) }}%</dd></div>
+        </dl>
+    </article>
+    <article>
+        <h2>Regression</h2>
+        <dl>
+            <div><dt>MAE</dt><dd>{{ metrics.get("regression", {}).get("mae_lpa", 0) }} LPA</dd></div>
+            <div><dt>R2 Score</dt><dd>{{ metrics.get("regression", {}).get("r2_score", 0) }}</dd></div>
+            <div><dt>Average Salary</dt><dd>{{ metrics.get("dataset", {}).get("average_salary_lpa", 0) }} LPA</dd></div>
+        </dl>
+    </article>
+</section>
+
+<section class="importance-section">
+    <div class="section-heading">
+        <p class="eyebrow">Explainability</p>
+        <h2>Salary model feature importance</h2>
+    </div>
+    {% for name, value in metrics.get("feature_importance", {}).items() %}
+    <div class="importance-row">
+        <span>{{ name.replace("_", " ").title() }}</span>
+        <div><span style="width: {{ value * 100 }}%"></span></div>
+        <strong>{{ "%.1f"|format(value * 100) }}%</strong>
+    </div>
+    {% else %}
+    <p>Train the model to view feature importance.</p>
+    {% endfor %}
+</section>
+{% endblock %}

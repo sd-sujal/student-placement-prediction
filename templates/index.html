@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Predict Placement{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Machine learning dashboard</p>
+        <h1>Student Placement Prediction System</h1>
+        <p class="hero-copy">Estimate placement probability, expected salary, and the next best improvement areas from academic, skill, and experience inputs.</p>
+    </div>
+    <div class="hero-stats">
+        <div>
+            <span>{{ metrics.get("dataset", {}).get("rows", 0) }}</span>
+            <small>Training rows</small>
+        </div>
+        <div>
+            <span>{{ "%.1f"|format((metrics.get("classification", {}).get("accuracy", 0) * 100)) }}%</span>
+            <small>Accuracy</small>
+        </div>
+        <div>
+            <span>{{ "%.2f"|format(metrics.get("regression", {}).get("mae_lpa", 0)) }}</span>
+            <small>Salary MAE LPA</small>
+        </div>
+    </div>
+</section>
+
+<section class="workspace">
+    <form class="prediction-form" method="post">
+        <div class="section-heading">
+            <p class="eyebrow">Student profile</p>
+            <h2>Enter candidate details</h2>
+        </div>
+
+        <label class="field full-width">
+            <span>Student Name</span>
+            <input type="text" name="student_name" value="{{ form_data.get('student_name', '') }}" placeholder="Optional">
+        </label>
+
+        <div class="field-grid">
+            {% for name, config in features.items() %}
+            <label class="field">
+                <span>{{ config.label }}</span>
+                <input
+                    type="number"
+                    name="{{ name }}"
+                    min="{{ config.min }}"
+                    max="{{ config.max }}"
+                    step="{{ config.step }}"
+                    value="{{ form_data.get(name, '') }}"
+                    required
+                >
+                {% if errors.get(name) %}
+                <small class="error">{{ errors.get(name) }}</small>
+                {% endif %}
+            </label>
+            {% endfor %}
+        </div>
+
+        <button class="primary-button" type="submit">Predict Placement</button>
+    </form>
+
+    <aside class="result-panel">
+        {% if result %}
+        <div class="prediction-card">
+            <p class="eyebrow">Prediction result</p>
+            <h2>{{ result.prediction_label }}</h2>
+            <div class="probability-ring" style="--score: {{ result.placement_probability }}%">
+                <span>{{ result.placement_probability }}%</span>
+                <small>placement probability</small>
+            </div>
+            <div class="salary-box">
+                <span>Expected Salary</span>
+                <strong>{{ result.expected_salary_lpa }} LPA</strong>
+            </div>
+            <p class="recommendation">{{ result.recommendation }}</p>
+            <div class="tags">
+                {% for strength in result.strengths %}
+                <span>{{ strength }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p class="eyebrow">Ready</p>
+            <h2>Run a prediction to view probability, salary, and guidance.</h2>
+        </div>
+        {% endif %}
+    </aside>
+</section>
+
+<section class="recent-section">
+    <div class="section-heading">
+        <p class="eyebrow">Recent activity</p>
+        <h2>Latest predictions</h2>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Probability</th>
+                    <th>Status</th>
+                    <th>Salary</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in recent_predictions %}
+                <tr>
+                    <td>{{ row.student_name or "Anonymous" }}</td>
+                    <td>{{ "%.2f"|format(row.placement_probability) }}%</td>
+                    <td><span class="status">{{ row.prediction_label }}</span></td>
+                    <td>{{ "%.2f"|format(row.expected_salary_lpa) }} LPA</td>
+                    <td>{{ row.created_at }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">No predictions yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

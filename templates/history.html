@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction History{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Audit trail</p>
+        <h1>Prediction History</h1>
+    </div>
+    <a class="secondary-button" href="{{ url_for('export_history') }}">Export CSV</a>
+</section>
+
+<section class="summary-grid">
+    <div>
+        <span>{{ summary.total_predictions or 0 }}</span>
+        <small>Total predictions</small>
+    </div>
+    <div>
+        <span>{{ "%.1f"|format(summary.avg_probability or 0) }}%</span>
+        <small>Average probability</small>
+    </div>
+    <div>
+        <span>{{ summary.likely_placed or 0 }}</span>
+        <small>Likely placed</small>
+    </div>
+</section>
+
+<section class="table-wrap wide">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>CGPA</th>
+                <th>Coding</th>
+                <th>Aptitude</th>
+                <th>Probability</th>
+                <th>Status</th>
+                <th>Salary</th>
+                <th>Recommendation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in predictions %}
+            <tr>
+                <td>{{ row.student_name or "Anonymous" }}</td>
+                <td>{{ row.cgpa }}</td>
+                <td>{{ row.coding_skill }}</td>
+                <td>{{ row.aptitude_score }}</td>
+                <td>{{ "%.2f"|format(row.placement_probability) }}%</td>
+                <td><span class="status">{{ row.prediction_label }}</span></td>
+                <td>{{ "%.2f"|format(row.expected_salary_lpa) }} LPA</td>
+                <td>{{ row.recommendation }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8">No predictions yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
