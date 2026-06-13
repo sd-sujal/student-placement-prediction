@@ -77,6 +77,3 @@ curl -X POST http://127.0.0.1:5000/api/predict ^
   -d "{\"cgpa\":8.2,\"backlogs\":0,\"internships\":2,\"projects\":4,\"certifications\":3,\"aptitude_score\":82,\"communication_score\":78,\"coding_skill\":86}"
 ```
 
-## Resume Bullet
-
-Built an end-to-end Flask and Scikit-learn student placement prediction system with reproducible data generation, ML training pipeline, placement probability scoring, salary estimation, SQLite prediction history, CSV export, and model explainability dashboard.
